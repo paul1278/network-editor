@@ -16,14 +16,23 @@ def load():
       loadProtocols()
       loadActions()
       loadFilter()
+      checkInterfaces()
+      data["debug"] = data.get("debug", False)
+      set_debug(data["debug"])
+      return True
   except FileNotFoundError:
     error("Config file was not found!")
+    return False
+  except yaml.constructor.ConstructorError as e:
+    error("Config file was not readable!", "\n", e)
+    return False
 
 def loadProtocols():
   global data, protocols
   for p in data["protocols"] or []:
     try:
       protocols[p] = __import__("protocols." + p)
+      protocols[p] = getattr(protocols[p], p)
       ok("Loaded protocol:", p)
     except ModuleNotFoundError:
       error("Could not find protocol:", p)
@@ -33,6 +42,7 @@ def loadFilter():
   for p in data["filter"] or []:
     try:
       filters[p] = __import__("filter." + p)
+      filters[p] = getattr(filters[p], p)
       ok("Loaded filter:", p)
     except ModuleNotFoundError:
       error("Could not find filter:", p)
@@ -42,6 +52,11 @@ def loadActions():
   for p in data["actions"] or []:
     try:
       actions[p] = __import__("actions." + p)
+      actions[p] = getattr(actions[p], p)
       ok("Loaded action:", p)
     except ModuleNotFoundError:
       error("Could not find action:", p)
+
+def checkInterfaces():
+  global data
+  ok("Network-interfaces are", data["interface1"], "&", data["interface2"])
