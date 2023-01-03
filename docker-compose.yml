@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  alice:
+    image: awesome
+    build: ./docker
+    command: '/main.sh'
+    volumes:
+      - ./alice.sh:/main.sh:ro
+    networks:
+      net1:
+        ipv4_address: 172.18.0.2
+    cap_add:
+    - NET_ADMIN
+
+  bob:
+    image: awesome
+    build: ./docker
+    command: '/main.sh'
+    volumes:
+      - ./bob.sh:/main.sh:ro
+    networks:
+      net2:
+        ipv4_address: 172.19.0.2
+    cap_add:
+    - NET_ADMIN
+      
+  mallory:
+    image: python:3
+    command: "./docker_start.sh"
+    volumes:
+      - "./src:/main"
+    working_dir: "/main"
+    networks:
+      net1:
+        ipv4_address: 172.18.0.5
+      net2:
+        ipv4_address: 172.19.0.5
+    sysctls:
+      - net.ipv4.ip_forward=0
+
+
+networks:
+    net1:
+      ipam:
+        driver: default
+        config:
+          - subnet: 172.18.0.0/16
+    net2:
+      ipam:
+        driver: default
+        config:
+          - subnet: 172.19.0.0/16
