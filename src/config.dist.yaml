@@ -1,5 +1,12 @@
 protocols:
 
 actions:
-  
+  - udpPayload
+
 filter:
+  - udp
+
+interface1: eth0
+interface2: eth1
+
+debug: true
