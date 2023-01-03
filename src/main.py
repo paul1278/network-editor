@@ -11,6 +11,13 @@ def pkt_callback_i2(pkt):
 def handlePaket(pkt, direction):
 	ret = True
 	debug(config.data["interface" + str(direction +1)] + ":", "Got packet", pkt)
+	if direction == 0:
+		pkt[Ether].dst = config.data["mac2"]
+		pkt[Ether].src = config.data["localmac2"]
+	else:
+		pkt[Ether].dst = config.data["mac1"]
+		pkt[Ether].src = config.data["localmac1"]
+	pkt = Ether(bytes(pkt))
 	for f in config.filters:
 		if pkt == False or pkt == True:
 			return pkt
