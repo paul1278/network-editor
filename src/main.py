@@ -1,6 +1,6 @@
 from scapy.all import conf,bridge_and_sniff,UDP,Raw,Ether,IP
 from utils import *
-import config
+import workspace
 
 
 conf.verb=3
@@ -15,26 +15,26 @@ def pkt_callback_i2(pkt):
 
 def handlePaket(pkt, direction):
 	ret = True
-	debug(config.data["interface" + str(direction +1)] + ":", "Got packet", pkt)
-	#appendLog(config.data["interface" + str(direction +1)] + ": Got packet" + str(pkt))
+	debug(workspace.data["interface" + str(direction +1)] + ":", "Got packet", pkt)
+	#appendLog(workspace.data["interface" + str(direction +1)] + ": Got packet" + str(pkt))
 	if direction == 0:
-		pkt[Ether].dst = config.data["mac2"]
-		pkt[Ether].src = config.data["localmac2"]
+		pkt[Ether].dst = workspace.data["mac2"]
+		pkt[Ether].src = workspace.data["localmac2"]
 	else:
-		pkt[Ether].dst = config.data["mac1"]
-		pkt[Ether].src = config.data["localmac1"]
+		pkt[Ether].dst = workspace.data["mac1"]
+		pkt[Ether].src = workspace.data["localmac1"]
 	pkt = Ether(bytes(pkt))
 	
-	for f in config.filters:
+	for f in workspace.filters:
 		if pkt == False or pkt == True:
 			return pkt
-		testingFilter = config.filters[f]
+		testingFilter = workspace.filters[f]
 		if testingFilter.check(pkt, direction):
 			debug("Filter", f, "is true")
 			for a in testingFilter.actions:
 				if pkt == False or pkt == True:
 					return pkt
-				action = config.actions[a]
+				action = workspace.actions[a]
 				pkt = action.modPaket(pkt)
 				ok("Action", a, "changed the packet by filter", f)
 			break
@@ -90,6 +90,6 @@ def start_bridge(mainwin):
 	prepareWin()
 	log = []
 	ok("Bridge is starting up")
-	bridge_and_sniff(config.data["interface1"], config.data["interface2"], xfrm12=pkt_callback_i1, xfrm21=pkt_callback_i2, count=0, store=0)
+	bridge_and_sniff(workspace.data["interface1"], workspace.data["interface2"], xfrm12=pkt_callback_i1, xfrm21=pkt_callback_i2, count=0, store=0)
 	stopWin()
 	ok("bye!!")

@@ -1,0 +1,17 @@
+protocols:
+
+actions:
+  - tcpPayload
+
+filter:
+  - tcp
+interface1: eth0
+interface2: eth1
+
+mac1: 02:42:ac:12:00:02
+mac2: 02:42:ac:13:00:02
+
+localmac1: 02:42:ac:12:00:05
+localmac2: 02:42:ac:13:00:05
+
+debug: true

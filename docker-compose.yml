@@ -30,6 +30,7 @@ services:
     command: "./docker_start.sh"
     volumes:
       - "./src:/main"
+      - "./workspace:/opt/workspace"
     working_dir: "/main"
     networks:
       net1:

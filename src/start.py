@@ -3,6 +3,8 @@ import math
 from utils import *
 import config
 import main
+import args
+import workspace
 
 mainwin = None
 mainwin_inner = None
@@ -66,7 +68,8 @@ def start(stdscr):
         except:
             break
     win4.refresh()
-    inputLoop()
+    while True:
+        inputLoop()
 
 def inputLoop():
     k = 0
@@ -111,7 +114,6 @@ def inputLoop():
     commandwin.box()
     _input_ = ""
     commandwin.refresh()
-    inputLoop()
 
 def printActiveFilters():
     activewin.addstr(1, 2, "Active filters:")
@@ -143,8 +145,21 @@ if __name__ == "__main__":
     if config.load() == False:
         error("Program terminated")
         quit(1)
-    if len(sys.argv) > 1 and sys.argv[1] == "-i":
+    
+    setDebug(args.argParser().verbose)
+
+    if isUI():
         ok("Starting interactive UI mode")
         prgm()
-    else:
+    else:    
+        ws = args.argParser().workspace
+        if(ws == None):
+            error("Specify a workspace using -w")
+            sys.exit(1)
+        ok("Loading workspace", ws)
+        if workspace.loadWorkspace(ws):
+            ok("Loaded workspace", ws)
+        else:
+            error("Cannot load workspace under", ws, "- is it really a workspace?")
+            sys.exit(1)
         main.start_bridge(None)

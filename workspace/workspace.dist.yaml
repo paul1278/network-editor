@@ -1,0 +1,18 @@
+protocols:
+
+actions:
+  - udpPayload
+
+filter:
+  - udp
+
+interface1: eth0
+interface2: eth1
+
+mac1: 00:00:00:00:00:00
+mac2: 00:00:00:00:00:00
+
+localmac1: 00:00:00:00:00:00
+localmac2: 00:00:00:00:00:00
+
+debug: true
