@@ -40,7 +40,7 @@ def print_header():
                                    |_|                 ''')
   ok("Starting up")
 
-def set_debug(v):
+def setDebug(v):
   global debug
   debug = v
 

@@ -18,13 +18,16 @@ def load():
       loadFilter()
       checkInterfaces()
       data["debug"] = data.get("debug", False)
-      set_debug(data["debug"])
+      setDebug(data["debug"])
       return True
   except FileNotFoundError:
     error("Config file was not found!")
     return False
   except yaml.constructor.ConstructorError as e:
     error("Config file was not readable!", "\n", e)
+    return False
+  except yaml.parser.ParserError as e:
+    error("Config file was not parsable!", "\n", e)
     return False
 
 def loadProtocols():
