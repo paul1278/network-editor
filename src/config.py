@@ -28,7 +28,7 @@ def load():
     return False
 
 def loadProtocols():
-  global data, protocols
+  global protocols
   for p in data["protocols"] or []:
     try:
       protocols[p] = __import__("protocols." + p)
@@ -38,7 +38,7 @@ def loadProtocols():
       error("Could not find protocol:", p)
 
 def loadFilter():
-  global data, filters
+  global filters
   for p in data["filter"] or []:
     try:
       filters[p] = __import__("filter." + p)
@@ -48,7 +48,7 @@ def loadFilter():
       error("Could not find filter:", p)
 
 def loadActions():
-  global data, actions
+  global actions
   for p in data["actions"] or []:
     try:
       actions[p] = __import__("actions." + p)
@@ -58,5 +58,4 @@ def loadActions():
       error("Could not find action:", p)
 
 def checkInterfaces():
-  global data
   ok("Network-interfaces are", data["interface1"], "&", data["interface2"])
