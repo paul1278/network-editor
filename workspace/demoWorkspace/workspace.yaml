@@ -2,9 +2,12 @@ protocols:
 
 actions:
   - tcpPayload
+  - udpPayload
 
 filter:
   - tcp
+  - udp
+
 interface1: eth0
 interface2: eth1
 

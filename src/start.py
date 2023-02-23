@@ -96,15 +96,16 @@ def inputLoop():
         commandwin.refresh()
     
     mainwin_inner.clear()
-    if _input_ == "filters":
-        mainwin_inner.addstr(0,0, "")
-        printActiveFilters()
-    elif _input_ == "help":
+    if _input_ == "help":
         printHelp()
     elif _input_ == "eb":
         main.start_bridge(mainwin_inner)
+    elif _input_ == "reload":
+        workspace.reload()
     elif _input_[0:3] == "ef ":
-        enableFilter(_input_[3:])
+        enableFilter(_input_[3:].strip())
+    elif _input_[0:3] == "df ":
+        disableFilter(_input_[3:].strip())
     else:
         mainwin_inner.addstr(0,0, "Dont know that command!")
     mainwin_inner.refresh()
@@ -117,8 +118,8 @@ def inputLoop():
 
 def printActiveFilters():
     activewin.addstr(1, 2, "Active filters:")
-    for i,f in enumerate(config.filters):
-        activewin.addstr(i + 2, 2, "- " + f + " (triggers: " + ", ".join(config.filters[f].actions) + ")")
+    for i,f in enumerate(workspace.filters):
+        activewin.addstr(i + 2, 2, "- " + f + " [" + ("ENABLED" if workspace.filters[f].enabled else "DISABLED") + "]" + " (triggers: " + ", ".join(workspace.filters[f].actions) + ")")
     activewin.refresh()
 
 def prgm():
@@ -128,17 +129,27 @@ def printHelp():
     mainwin_inner.addstr(0,0, 'Help')
     mainwin_inner.addstr(1,0, 'In the following you can see all available commands.')
     cmds = [
-        "filters \tShow all filters",
         "eb \t\tEnable bridge (Stop with CTRL+c again)",
-        "ef <filter>\tEnable filter"
+        "ef <filter>\tEnable filter",
+        "df <filter>\tDisable filter",
+        "reload\t\tReload workspace code"
     ]
     for i,f in enumerate(cmds):
         mainwin_inner.addstr(i + 3, 0, f)
 
 def enableFilter(name):
-    filter = config.filters.get(name, None)
+    filter = workspace.filters.get(name, None)
     if filter == None:
         mainwin_inner.addstr(0,0, 'Error! Cannot find filter with name ' + name, curses.color_pair(2))
+    workspace.enableFilter(name)
+    printActiveFilters()
+
+def disableFilter(name):
+    filter = workspace.filters.get(name, None)
+    if filter == None:
+        mainwin_inner.addstr(0,0, 'Error! Cannot find filter with name ' + name, curses.color_pair(2))
+    workspace.disableFilter(name)
+    printActiveFilters()
 
 if __name__ == "__main__":
     print_header()
@@ -148,18 +159,19 @@ if __name__ == "__main__":
     
     setDebug(args.argParser().verbose)
 
-    if isUI():
+    ws = args.argParser().workspace
+    if(ws == None):
+        error("Specify a workspace using -w")
+        sys.exit(1)
+    ok("Loading workspace", ws)
+    if workspace.loadWorkspace(ws):
+        ok("Loaded workspace", ws)
+    else:
+        error("Cannot load workspace under", ws, "- is it really a workspace?")
+        sys.exit(1)
+    
+    if args.argParser().interactive:
         ok("Starting interactive UI mode")
         prgm()
     else:    
-        ws = args.argParser().workspace
-        if(ws == None):
-            error("Specify a workspace using -w")
-            sys.exit(1)
-        ok("Loading workspace", ws)
-        if workspace.loadWorkspace(ws):
-            ok("Loaded workspace", ws)
-        else:
-            error("Cannot load workspace under", ws, "- is it really a workspace?")
-            sys.exit(1)
         main.start_bridge(None)

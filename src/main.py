@@ -29,6 +29,8 @@ def handlePaket(pkt, direction):
 		if pkt == False or pkt == True:
 			return pkt
 		testingFilter = workspace.filters[f]
+		if testingFilter.enabled == False:
+			continue
 		if testingFilter.check(pkt, direction):
 			debug("Filter", f, "is true")
 			for a in testingFilter.actions:
