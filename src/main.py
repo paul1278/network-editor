@@ -2,12 +2,9 @@ from scapy.all import conf,bridge_and_sniff,UDP,Raw,Ether,IP
 from utils import *
 import config
 
-log = []
 
 conf.verb=3
 conf.sniff_promisc=True
-
-_mainwin = None
 
 
 def pkt_callback_i1(pkt):
@@ -15,10 +12,6 @@ def pkt_callback_i1(pkt):
 
 def pkt_callback_i2(pkt):
 	return handlePaket(pkt, 1)
-
-def appendLog(*entry):
-	log.append(" ".join(entry))
-	printWin(log)
 
 def handlePaket(pkt, direction):
 	ret = True
@@ -47,6 +40,10 @@ def handlePaket(pkt, direction):
 			break
 	return pkt
 
+
+# UI things #
+_mainwin = None
+log = []
 def prepareWin():
 	if(_mainwin == None):
 		return
@@ -75,6 +72,18 @@ def printWin(log):
 		_mainwin.addstr(h - i,0,log[j])
 	_mainwin.refresh()
 
+def appendLog(*entry):
+	log.append(
+		" ".join(
+			map(
+				lambda s: str(s)
+			,entry
+			)
+		)
+	)
+	printWin(log)
+
+# Start everything #
 def start_bridge(mainwin):
 	global _mainwin,log
 	_mainwin = mainwin

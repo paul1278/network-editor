@@ -10,19 +10,23 @@ def ansiColor(color):
     return "\u001b[0m"
   elif(color == "green"):
     return "\u001b[32m"
+  elif(color == "blue"):
+    return "\u001b[34m"
+  elif(color == "red"):
+    return "\u001b[31m"
 
 def ok(*args):
   loggingFunc("{}[+]{}".format(colorFunc("green"),colorFunc("reset")), *args)
 
 def error(*args):
-  loggingFunc("\u001b[31m[-]\u001b[0m", *args)
+  loggingFunc("{}[-]{}".format(colorFunc("red"),colorFunc("reset")), *args)
 
 def isUI():
   return len(sys.argv) > 1 and sys.argv[1] == "-i"
 
 def debug(*args):
-  if debug and not isUI():
-    loggingFunc("[*]\u001b[0m", *args)
+  if debug:
+    loggingFunc("{}[*]{}".format(colorFunc("blue"),colorFunc("reset")), *args)
 
 def print_header():
   print(''' (   (                                                 
