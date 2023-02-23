@@ -29,7 +29,7 @@ def handlePaket(pkt, direction):
 		if pkt == False or pkt == True:
 			return pkt
 		testingFilter = config.filters[f]
-		if testingFilter.check(pkt):
+		if testingFilter.check(pkt, direction):
 			debug("Filter", f, "is true")
 			for a in testingFilter.actions:
 				if pkt == False or pkt == True:

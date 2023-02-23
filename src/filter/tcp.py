@@ -1,6 +1,6 @@
 from scapy.all import TCP,Raw
 
-def check(pkt):
-  return pkt.haslayer(TCP)
+def check(pkt, direction):
+  return pkt.haslayer(TCP) and direction == 0
 
 actions = ["tcpPayload"]
