@@ -2,13 +2,24 @@ import curses
 import math
 from utils import *
 import config
-config.load()
+import main
 
 mainwin = None
 mainwin_inner = None
 commandwin = None
 activewin = None
 stdwin = None
+
+head = ''' (   (                                                 
+ )\ ))\ )         )                          )         
+(()/(()/(      ( /(  (  (         (       ( /(    (    
+ /(_))(_))(    )\())))\ )(   (   ))\`  )  )\())(  )(   
+(_))(_))  )\ )(_))//((_|()\  )\ /((_)(/( (_))/ )\(()\  
+| _ \_ _|_(_/(| |_(_))  ((_)((_|_))((_)_\| |_ ((_)((_) 
+|  _/| || ' \))  _/ -_)| '_/ _|/ -_) '_ \)  _/ _ \ '_| 
+|_| |___|_||_| \__\___||_| \__|\___| .__/ \__\___/_|   
+                                   |_|                 '''
+
 def start(stdscr):
     global mainwin, mainwin_inner, commandwin, activewin, stdwin
     stdwin = stdscr
@@ -29,7 +40,7 @@ def start(stdscr):
     mainwin.box()
     mainwin.refresh()
 
-    mainwin_inner = curses.newwin(height - 3, width - 4, begin_y + 1, begin_x + 2)
+    mainwin_inner = curses.newwin(height - 2, width - 4, begin_y + 1, begin_x + 2)
     mainwin_inner.addstr(1,1, "\u001b[32m[+]\u001b[0m")
     mainwin_inner.refresh()
 
@@ -46,12 +57,21 @@ def start(stdscr):
     printActiveFilters()
     win4 = curses.newwin(height - _height, dims[1] - width, _height, width)
     win4.box()
+    lines = head.splitlines()
+    dims4 = win4.getmaxyx()
+    for i in range(len(head.splitlines())):
+        line = lines[i]
+        try:
+            win4.addstr(i + 2, math.floor((dims4[1] - len(line)) / 2), line)
+        except:
+            break
     win4.refresh()
     inputLoop()
 
 def inputLoop():
     k = 0
     _input_ = ""
+    mlen = 0
     # Loop where k is the last character pressed
     while (k != '\n'):
 
@@ -59,7 +79,14 @@ def inputLoop():
         k = stdwin.getkey()
         if(k == "\n"):
             break
-        _input_ += str(k)
+        if(len(k) > 1):
+            # Special key
+            if k == "KEY_BACKSPACE":
+                _input_ = _input_[0:-1]
+            else:
+                continue
+        else:
+            _input_ += str(k)
 
         # Refresh the screen
         commandwin.addstr(2,4, _input_)
@@ -68,8 +95,11 @@ def inputLoop():
     mainwin_inner.clear()
     if _input_ == "filters":
         mainwin_inner.addstr(0,0, "")
+        printActiveFilters()
     elif _input_ == "help":
         printHelp()
+    elif _input_ == "eb":
+        main.start_bridge(mainwin_inner)
     elif _input_[0:3] == "ef ":
         enableFilter(_input_[3:])
     else:
@@ -86,17 +116,19 @@ def inputLoop():
 def printActiveFilters():
     activewin.addstr(1, 2, "Active filters:")
     for i,f in enumerate(config.filters):
-        activewin.addstr(i + 2, 2, "- " + f)
+        activewin.addstr(i + 2, 2, "- " + f + " (triggers: " + ", ".join(config.filters[f].actions) + ")")
     activewin.refresh()
 
-def main():
+def prgm():
     curses.wrapper(start)
 
 def printHelp():
     mainwin_inner.addstr(0,0, 'Help')
     mainwin_inner.addstr(1,0, 'In the following you can see all available commands.')
     cmds = [
-        "filters \tShow all filters"
+        "filters \tShow all filters",
+        "eb \t\tEnable bridge (Stop with CTRL+c again)",
+        "ef <filter>\tEnable filter"
     ]
     for i,f in enumerate(cmds):
         mainwin_inner.addstr(i + 3, 0, f)
@@ -107,4 +139,8 @@ def enableFilter(name):
         mainwin_inner.addstr(0,0, 'Error! Cannot find filter with name ' + name, curses.color_pair(2))
 
 if __name__ == "__main__":
-    main()
+    print_header()
+    if config.load() == False:
+        error("Program terminated")
+        quit(1)
+    prgm()

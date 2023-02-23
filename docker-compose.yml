@@ -38,6 +38,8 @@ services:
         ipv4_address: 172.19.0.5
     sysctls:
       - net.ipv4.ip_forward=0
+    cap_add:
+    - NET_ADMIN
 
 
 networks:
