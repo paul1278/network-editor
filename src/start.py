@@ -143,4 +143,8 @@ if __name__ == "__main__":
     if config.load() == False:
         error("Program terminated")
         quit(1)
-    prgm()
+    if len(sys.argv) > 1 and sys.argv[1] == "-i":
+        ok("Starting interactive UI mode")
+        prgm()
+    else:
+        main.start_bridge(None)
