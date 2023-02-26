@@ -39,7 +39,6 @@ def handlePaket(pkt, direction):
 				action = workspace.actions[a]
 				pkt = action.modPaket(pkt)
 				ok("Action", a, "changed the packet by filter", f)
-			break
 	return pkt
 
 
