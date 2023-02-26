@@ -11,6 +11,10 @@ filters = {}
 actions = {}
 currentWorkspacePath = None
 
+class ActionNotLoadableError(Exception):
+  def __init__(self, a):
+    self.actionName = a
+
 def isWorkspace(path):
   if isdir(path):
     if isdir(path + "/protocols") and isdir(path + "/actions") and isdir(path + "/filter"):
@@ -37,7 +41,6 @@ def loadWorkspace(path):
     with open(path + '/workspace.yaml') as f:
       data = yaml.load(f, Loader=SafeLoader)
       loadProtocols()
-      loadActions()
       loadFilter()
       checkInterfaces()
       return True
@@ -72,9 +75,14 @@ def loadFilter():
         filters[p] = __import__("filter." + p)
         filters[p] = getattr(filters[p], p)
         filters[p].enabled = True
+        loadActions(filters[p].actions)
       else:
         mreload(filters[p])
+        loadActions(filters[p].actions)
       ok("Loaded filter:", p)
+    except ActionNotLoadableError as loadedAction:
+      error("Could not load filter because action is not loadable:", loadedAction.actionName)
+      sys.exit(2)
     except ModuleNotFoundError:
       error("Could not find filter:", p)
 
@@ -84,9 +92,9 @@ def disableFilter(name):
 def enableFilter(name):
   filters[name].enabled = True
 
-def loadActions():
+def loadActions(names):
   global actions
-  for p in data["actions"] or []:
+  for p in names or []:
     try:
       if actions.get(p, None) == None:
         actions[p] = __import__("actions." + p)
@@ -95,7 +103,7 @@ def loadActions():
         mreload(actions[p])
       ok("Loaded action:", p)
     except ModuleNotFoundError:
-      error("Could not find action:", p)
+      raise ActionNotLoadableError(p)
 
 def checkInterfaces():
   ok("Network-interfaces are", data["interface1"], "&", data["interface2"])

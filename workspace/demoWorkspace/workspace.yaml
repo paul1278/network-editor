@@ -1,9 +1,5 @@
 protocols:
 
-actions:
-  - tcpPayload
-  - udpPayload
-
 filter:
   - tcp
   - udp
