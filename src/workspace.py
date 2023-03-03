@@ -5,8 +5,10 @@ from os.path import isdir
 import sys
 from importlib import reload as mreload  # Python 3.4+
 
+class LoadedProtocols:
+  pass
 data = None
-protocols = {}
+protocols = LoadedProtocols()
 filters = {}
 actions = {}
 currentWorkspacePath = None
@@ -58,9 +60,10 @@ def loadProtocols():
   global protocols
   for p in data["protocols"] or []:
     try:
-      if protocols.get(p, None) == None:
-        protocols[p] = __import__("protocols." + p)
-        protocols[p] = getattr(protocols[p], p)
+      if getattr(protocols, p, None) == None:
+        load = __import__("protocols." + p)
+        load = getattr(load, p)
+        setattr(protocols, p, load) 
       else:
         mreload(protocols[p])
       ok("Loaded protocol:", p)
