@@ -1,4 +1,4 @@
-from scapy.all import conf,bridge_and_sniff,UDP,Raw,Ether,IP
+from scapy.all import conf,bridge_and_sniff,UDP,Raw,Ether,IP,TCP
 from utils import *
 import workspace
 
@@ -23,6 +23,10 @@ def handlePaket(pkt, direction):
 	else:
 		pkt[Ether].dst = workspace.data["mac1"]
 		pkt[Ether].src = workspace.data["localmac1"]
+	if pkt.haslayer(TCP):
+		pkt[TCP].chksum = None
+		pkt[TCP].len = None
+
 	pkt = Ether(bytes(pkt))
 	
 	for f in workspace.filters:
