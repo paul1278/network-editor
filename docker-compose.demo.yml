@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  coffee_server:
+    image: awesome_py
+    build: ./demo
+    command: 'python3 coffee_server.py'
+    volumes:
+      - ./demo/coffee_server.py:/coffee_server.py:ro
+    networks:
+      net1:
+        ipv4_address: 172.18.0.2
+    cap_add:
+    - NET_ADMIN
+
+  coffee_machine:
+    image: awesome_py
+    build: ./demo
+    command: 'python3 coffee_client.py'
+    volumes:
+      - ./demo/coffee_client.py:/coffee_client.py:ro
+    networks:
+      net2:
+        ipv4_address: 172.19.0.2
+    cap_add:
+    - NET_ADMIN
+      
+  mallory:
+    image: python:3
+    command: "./docker_start.sh"
+    volumes:
+      - "./src:/main"
+      - "./workspace:/opt/workspace"
+    working_dir: "/main"
+    networks:
+      net1:
+        ipv4_address: 172.18.0.5
+      net2:
+        ipv4_address: 172.19.0.5
+    sysctls:
+      - net.ipv4.ip_forward=0
+    cap_add:
+    - NET_ADMIN
+
+
+networks:
+    net1:
+      ipam:
+        driver: default
+        config:
+          - subnet: 172.18.0.0/16
+    net2:
+      ipam:
+        driver: default
+        config:
+          - subnet: 172.19.0.0/16
