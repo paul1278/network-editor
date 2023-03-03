@@ -1,9 +1,9 @@
 protocols:
+  - demo
 
 filter:
-  - tcp
   - udp
-
+  - demo
 interface1: eth0
 interface2: eth1
 
