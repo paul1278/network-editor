@@ -1,7 +1,7 @@
 from scapy.all import conf,bridge_and_sniff,UDP,Raw,Ether,IP,TCP
 from utils import *
 import workspace
-
+import traceback
 
 conf.verb=3
 conf.sniff_promisc=True
@@ -16,18 +16,18 @@ def pkt_callback_i2(pkt):
 def handlePaket(pkt, direction):
 	ret = True
 	debug(workspace.data["interface" + str(direction +1)] + ":", "Got packet", pkt)
-	#appendLog(workspace.data["interface" + str(direction +1)] + ": Got packet" + str(pkt))
-	if direction == 0:
-		pkt[Ether].dst = workspace.data["mac2"]
-		pkt[Ether].src = workspace.data["localmac2"]
-	else:
-		pkt[Ether].dst = workspace.data["mac1"]
-		pkt[Ether].src = workspace.data["localmac1"]
-	if pkt.haslayer(TCP):
-		pkt[TCP].chksum = None
-		pkt[TCP].len = None
+	if workspace.data.get("rewriteMAC", None) == True:
+		if direction == 0:
+			pkt[Ether].dst = workspace.data["mac2"]
+			pkt[Ether].src = workspace.data["localmac2"]
+		else:
+			pkt[Ether].dst = workspace.data["mac1"]
+			pkt[Ether].src = workspace.data["localmac1"]
+		if pkt.haslayer(TCP):
+			pkt[TCP].chksum = None
+			pkt[TCP].len = None
 
-	pkt = Ether(bytes(pkt))
+		pkt = Ether(bytes(pkt))
 	
 	for f in workspace.filters:
 		if pkt == False or pkt == True:
@@ -35,14 +35,18 @@ def handlePaket(pkt, direction):
 		testingFilter = workspace.filters[f]
 		if testingFilter.enabled == False:
 			continue
-		if testingFilter.check(pkt, direction):
-			debug("Filter", f, "is true")
-			for a in testingFilter.actions:
-				if pkt == False or pkt == True:
-					return pkt
-				action = workspace.actions[a]
-				pkt = action.modPaket(pkt)
-				ok("Action", a, "changed the packet by filter", f)
+		try:
+			if testingFilter.check(pkt, direction):
+				debug("Filter", f, "is true")
+				for a in testingFilter.actions:
+					if pkt == False or pkt == True:
+						return pkt
+					action = workspace.actions[a]
+					pkt = action.modPaket(pkt)
+					ok("Action", a, "changed the packet by filter", f)
+		except Exception as e:
+			error("Filter", f, "threw an exception, dropping the packet", repr(e))
+			debug(traceback.format_exc(chain=False))
 	return pkt
 
 
@@ -97,4 +101,4 @@ def start_bridge(mainwin):
 	ok("Bridge is starting up")
 	bridge_and_sniff(workspace.data["interface1"], workspace.data["interface2"], xfrm12=pkt_callback_i1, xfrm21=pkt_callback_i2, count=0, store=0)
 	stopWin()
-	ok("bye!!")
+	ok("Bridge is now down")

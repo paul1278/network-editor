@@ -12,4 +12,4 @@ mac2: 00:00:00:00:00:00
 localmac1: 00:00:00:00:00:00
 localmac2: 00:00:00:00:00:00
 
-debug: true
+rewriteMAC: true
