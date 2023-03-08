@@ -1,3 +1,4 @@
+#!/usr/local/bin/python3
 from utils import *
 import config
 import main
@@ -7,9 +8,10 @@ import ui
 
 
 if __name__ == "__main__":
+    # Print the application ASCII-header (very important!)
     print_header()
     if config.load() == False:
-        error("Program terminated")
+        error("Config not loadable - program terminated")
         quit(1)
     
     setDebug(args.argParser().verbose)

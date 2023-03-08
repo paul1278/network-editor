@@ -3,6 +3,7 @@ args = None
 
 
 def argParser():
+    # Make an argparser-instance which has all required params
     global args
     if args == None:
         parser = argparse.ArgumentParser(
