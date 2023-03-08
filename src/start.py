@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/env python3
 from utils import *
 import config
 import main
