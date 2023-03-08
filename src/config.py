@@ -1,6 +1,7 @@
 import yaml
 from yaml.loader import SafeLoader
 from utils import *
+import os 
 
 data = None
 
@@ -8,7 +9,7 @@ def load():
   global data
   try:
     # Open the file and load the file
-    with open('./config.yaml') as f:
+    with open(os.path.dirname(os.path.realpath(__file__)) + '/config.yaml') as f:
       data = yaml.load(f, Loader=SafeLoader)
       return True
   except FileNotFoundError:
