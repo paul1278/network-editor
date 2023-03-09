@@ -8,5 +8,5 @@ cp -r DEBIAN localbuild
 rsync --filter=':- ../.gitignore' -r ../src localbuild/opt/pinterceptor
 ln -s /opt/pinterceptor/src/start.py localbuild/usr/local/bin/pinterceptor
 cp localbuild/opt/pinterceptor/src/config.dist.yaml localbuild/opt/pinterceptor/src/config.yaml
-dpkg-deb --build --root-owner-group ./localbuild nice.deb
+dpkg-deb --build --root-owner-group ./localbuild network-editor.deb
 rm -r localbuild
