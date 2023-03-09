@@ -1,8 +1,8 @@
-# Network-Editor
+# Network-Editor: PInterceptor
 > **This product is for educational purposes only! You are not allowed to use it for anything illegal or something, you don't have permissions for.**
 
 This tool will allow you to modify network traffic as a Man-in-the-middle.
-You can define `filter`, which must match packets and will trigger `actions`.
+You can define a `filter`, which matches packets against your conditions and will trigger `actions`.
 Those will modify the packets.
 
 It is pretty simple to use - as long you can write some simple `python`-code.
@@ -50,6 +50,34 @@ localmac2: 02:42:ac:13:00:05
 # Set to false, when you want to be totally transparent (also deactivate IP-stack on your device) - in this case you don't need the mac-addresses above.
 rewriteMAC: true
 ```
+
+## Running the tool
+After installing the package, you can use it under `pinterceptor`.
+Otherwise, run `start.py` using `python3`.
+
+The command-line is pretty simple:
+```
+root@interceptor:/main# python3 start.py -h
+ (   (                                                 
+ )\ ))\ )         )                          )         
+(()/(()/(      ( /(  (  (         (       ( /(    (    
+ /(_))(_))(    )\())))\ )(   (   ))\`  )  )\())(  )(   
+(_))(_))  )\ )(_))//((_|()\  )\ /((_)(/( (_))/ )\(()\  
+| _ \_ _|_(_/(| |_(_))  ((_)((_|_))((_)_\| |_ ((_)((_) 
+|  _/| || ' \))  _/ -_)| '_/ _|/ -_) '_ \)  _/ _ \ '_| 
+|_| |___|_||_| \__\___||_| \__|\___| .__/ \__\___/_|   
+                                   |_|                 
+[+] Starting up
+usage: start.py [-h] [-w WORKSPACE] [-i] [-v]
+
+options:
+  -h, --help            show this help message and exit
+  -w WORKSPACE, --workspace WORKSPACE
+                        Give a path to a ready workspace
+  -i, --interactive     Start with a UI
+  -v, --verbose         Enable debug mode without config
+```
+If you want to see debug output on incoming / outgoing packets, we suggest turning on verbose-mode.
 
 ## Running the demo
 The demo consists of three parts:
