@@ -1,4 +1,6 @@
 # Network-Editor
+> **This product is for educational purposes only! You are not allowed to use it for anything illegal or something, you don't have permissions for.**
+
 This tool will allow you to modify network traffic as a Man-in-the-middle.
 You can define `filter`, which must match packets and will trigger `actions`.
 Those will modify the packets.
