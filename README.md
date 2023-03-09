@@ -79,6 +79,58 @@ options:
 ```
 If you want to see debug output on incoming / outgoing packets, we suggest turning on verbose-mode.
 
+## Writing modules
+### Protocols
+Protocols are written for `scapy` and must match the syntax accordingly. Just head to the [`scapy`-docs](https://scapy.readthedocs.io/en/latest/build_dissect.html) for that.
+Using the function `bind_layers` you can add your protocol to the layers.
+
+```python
+from scapy.all import Packet, XByteField, bind_layers, TCP
+
+class CoffeeProtocolPriceList(Packet):
+    name = "CoffeeProtocolPriceList"
+    fields_desc=[XByteField("actionType", 0)]
+
+bind_layers(TCP, CoffeeProtocolPriceList, sport=44445)
+```
+To activate a protocol, simply use the module-name on the `workspace.yaml`.
+
+### Filters
+A filter should match a packet to perform actions on it.
+It consists of a function called `check` and a list\<String\> called `actions`:
+```python
+from scapy.all import TCP,Raw
+from workspace import protocols
+
+def check(pkt, direction):
+  return pkt.haslayer(protocols.demo.CoffeeProtocolPriceList)
+
+actions = ["demoPayload"]
+```
+Each packet will be checked by your `check`-function, which should return `True` or `False`.
+If you return `True`, the program will launch each action from the `actions`-list.
+The actions are actually the file-names and the filters must be activated using the module-filename inside the `workspace.yaml`.
+
+### Actions
+An action receives a packet using the `modPaket(pkt)`-function.
+Make your changes there and return the packet again. Make sure to recalculate checksums when needed:
+```python
+from scapy.all import TCP,Ether,IP
+from workspace import protocols
+CoffeeProtocolPriceList = protocols.demo.CoffeeProtocolPriceList
+
+def modPaket(pkt):
+  pkt[TCP].payload[CoffeeProtocolPriceList].products[0].productName = "KAFFEEZZ"
+  pkt[TCP].payload[CoffeeProtocolPriceList].products[0].price = 1
+  
+  pkt[TCP].chksum = None
+  pkt[TCP].len = None
+  pkt[IP].len = None
+  pkt[IP].chksum = None
+  return Ether(bytes(pkt))
+```
+You can also include your custom protocols using `workspace.protocols`.
+
 ## Running the demo
 The demo consists of three parts:
 * COFFEE_SERVER: A server which will return a price-list for a COFFEE_MACHINE
