@@ -1,5 +1,5 @@
 Package: pinterceptor
-Version: 1.0
+Version: 1.0.0
 Architecture: amd64
 Maintainer: /dev/paul <git@dev-paul.de>
 Depends: python3,python3-scapy,python3-yaml
